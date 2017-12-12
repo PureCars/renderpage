@@ -1,0 +1,117 @@
+#!/usr/bin/env node
+
+'use strict';
+
+const fs = require('fs');
+const puppeteer = require('puppeteer');
+const yargs = require('yargs');
+const tempy = require('tempy');
+
+let args = yargs.options({
+    url: {
+        alias: 'u',
+        describe: 'Url of the page to render',
+        demandOption: true,
+    },
+    ua: {
+        describe: 'User agent to send to the page',
+        default: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36',
+    },
+    'wait-for': {
+        alias: 'w',
+        array: true,
+        describe: 'A list of selectors to wait for',
+    },
+    timeout: {
+        alias: 't',
+        number: true,
+        default: 30000,  // 30 seconds
+        describe: 'How long to wait for the page to be rendered',
+    },
+    script: {
+        alias: 's',
+        describe: 'Path to a script to run on the page',
+    },
+    'no-sandbox': {
+        boolean: true,
+        describe: 'Disable the Chrome sandbox mode',
+    },
+    json: {
+        alias: 'j',
+        boolean: true,
+        describe: 'Output a json object rather than outputting the page (the page will be saved to a file)',
+    },
+    output: {
+        alias: 'o',
+        describe: 'Path to save the rendered page',
+    }
+}).coerce('script', (arg) => {
+    return fs.readFileSync(arg, 'utf8');
+}).alias('help', 'h').alias('version', 'v').parse();
+
+(async () => {
+    try {
+        var launchArgs = {};
+        if (args['no-sandbox']) {
+            launchArgs['args'] = ['--no-sandbox', '--disable-setuid-sandbox'];
+        }
+
+        let browser = await puppeteer.launch(launchArgs);
+
+        let page = await browser.newPage();
+        page.setUserAgent(args.ua);
+
+        // Don't load images
+        page.setRequestInterception(true);
+        page.on('request', request => {
+            if (request.resourceType === 'image') {
+                request.abort();
+            }
+            else {
+                request.continue();
+            }
+        });
+
+        let response = await page.goto(args.url, {
+            waitUntil: 'networkidle2',
+            timeout: args.timeout,
+        });
+
+        if (args['wait-for'] && args['wait-for'].length > 0) {
+            await Promise.all(args['wait-for'].map((selector) => {
+                return page.waitForSelector(selector);
+            }));
+        }
+
+        let scriptResult = null;
+        if (args.script) {
+            scriptResult = await page.evaluate(args.script);
+        }
+
+        let text = await response.text();
+        let output = args.output ? args.output : tempy.file({extension: '.html'});
+        if (args.json) {
+            fs.writeFileSync(output, text);
+            console.log(JSON.stringify({
+                originalUrl: args.url,
+                url: response.url,
+                status_code: response.status,
+                file: output,
+                script_result: scriptResult,
+            }, null, 2));
+        }
+        else if (args.output) {
+            fs.writeFileSync(output, text);
+        }
+        else {
+            console.log(text);
+        }
+
+        await browser.close();
+        process.exit(0);
+    }
+    catch(e) {
+        console.error(e);
+        process.exit(1);
+    }
+})();

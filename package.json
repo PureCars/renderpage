@@ -1,0 +1,16 @@
+{
+  "name": "renderpage",
+  "version": "1.0.0",
+  "description": "CLI tool to render a page using Puppeteer",
+  "main": "renderpage",
+  "bin": {
+    "renderpage": "renderpage"
+  },
+  "author": "Brian Douglass",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "puppeteer": "^0.13.0",
+    "tempy": "^0.2.1",
+    "yargs": "^10.0.3"
+  }
+}
