@@ -6,6 +6,10 @@
   "bin": {
     "renderpage": "renderpage"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://bitbucket.org/showroomlogic/renderpage.git"
+  },
   "author": "Brian Douglass",
   "license": "GPL-3.0",
   "dependencies": {
