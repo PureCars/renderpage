@@ -32,9 +32,10 @@ let args = yargs.options({
         alias: 's',
         describe: 'Path to a script to run on the page',
     },
-    'no-sandbox': {
+    sandbox: {
         boolean: true,
-        describe: 'Disable the Chrome sandbox mode',
+        describe: 'Enable/Disable the Chrome sandbox mode',
+        default: true,
     },
     json: {
         alias: 'j',
@@ -52,7 +53,7 @@ let args = yargs.options({
 (async () => {
     try {
         var launchArgs = {};
-        if (args['no-sandbox']) {
+        if (!args.sandbox) {
             launchArgs['args'] = ['--no-sandbox', '--disable-setuid-sandbox'];
         }
 

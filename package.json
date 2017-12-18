@@ -1,6 +1,6 @@
 {
   "name": "@purecars/renderpage",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "CLI tool to render a page using Puppeteer",
   "main": "renderpage",
   "bin": {

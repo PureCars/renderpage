@@ -21,7 +21,8 @@ Options:
   --timeout, -t   How long to wait for the page to be rendered
                                                        [number] [default: 30000]
   --script, -s    Path to a script to run on the page
-  --no-sandbox    Disable the Chrome sandbox mode                      [boolean]
+  --sandbox       Enable/Disable the Chrome sandbox mode
+                                                       [boolean] [default: true]
   --json, -j      Output a json object rather than outputting the page (the page
                   will be saved to a file)                             [boolean]
   --output, -o    Path to save the rendered page
