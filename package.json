@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://bitbucket.org/showroomlogic/renderpage.git"
+    "url": "git+https://github.com/PureCars/renderpage.git"
   },
   "author": "Brian Douglass",
   "license": "GPL-3.0",
